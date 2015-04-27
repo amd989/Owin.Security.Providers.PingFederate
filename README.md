@@ -33,4 +33,8 @@ All you need to do is add a reference to the packagee using Nuget and add the fo
       }
       
 
+## NuGet
+
+[http://bit.ly/OpenIDConnect](Download the NuGet package here)
+
 
