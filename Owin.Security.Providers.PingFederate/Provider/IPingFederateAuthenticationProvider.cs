@@ -1,4 +1,10 @@
-﻿namespace Owin.Security.Providers.PingFederate.Provider
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IPingFederateAuthenticationProvider.cs" company="ShiftMe, Inc.">
+//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Owin.Security.Providers.PingFederate.Provider
 {
     using System.Threading.Tasks;
 
@@ -17,8 +23,20 @@
         /// <summary>
         /// Invoked prior to the <see cref="System.Security.Claims.ClaimsIdentity"/> being saved in a local cookie and the browser being redirected to the originally requested URL.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
         Task ReturnEndpoint(PingFederateReturnEndpointContext context);
+
+        /// <summary>
+        /// Invoked prior to the <see cref="System.Security.Claims.ClaimsIdentity"/> being saved in a local cookie and the browser being redirected to the originally requested URL.
+        /// </summary>
+        /// <param name="context">The context</param>
+        /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
+        Task Authenticating(PingFederateAuthenticatingContext context);
+
+        /// <summary>Invoked prior to calling the token request endpoint on PingFederate</summary>
+        /// <param name="context">The context</param>
+        /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
+        Task TokenRequest(PingFederateTokenRequestContext context);
     }
 }

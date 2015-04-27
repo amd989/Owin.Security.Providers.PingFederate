@@ -13,6 +13,10 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,7 +65,11 @@
     <Compile Include="PingFederateAuthenticationHandler.cs" />
     <Compile Include="PingFederateAuthenticationMiddleware.cs" />
     <Compile Include="PingFederateAuthenticationOptions.cs" />
+    <Compile Include="Provider\IPingFederateAuthenticationHandlerFactory.cs" />
     <Compile Include="Provider\PingFederateAuthenticatedContext.cs" />
+    <Compile Include="Provider\PingFederateAuthenticationHandlerFactory.cs" />
+    <Compile Include="Provider\PingFederateTokenRequestContext.cs" />
+    <Compile Include="Provider\PingFederateAuthenticatingContext.cs" />
     <Compile Include="Provider\PingFederateAuthenticationProvider.cs" />
     <Compile Include="Provider\PingFederateReturnEndpointContext.cs" />
     <Compile Include="Provider\IPingFederateAuthenticationProvider.cs" />

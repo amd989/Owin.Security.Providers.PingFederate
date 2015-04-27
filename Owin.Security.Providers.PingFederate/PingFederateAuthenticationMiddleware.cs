@@ -1,4 +1,10 @@
-﻿namespace Owin.Security.Providers.PingFederate
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="PingFederateAuthenticationMiddleware.cs" company="ShiftMe, Inc.">
+//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+// </copyright>
+// <author>Alejandro Mora</author>
+// --------------------------------------------------------------------------------------------------------------------
+namespace Owin.Security.Providers.PingFederate
 {
     using System;
     using System.Globalization;
@@ -14,49 +20,95 @@
     using Owin.Security.Providers.PingFederate.Properties;
     using Owin.Security.Providers.PingFederate.Provider;
 
+    /// <summary>The ping federate authentication middleware.</summary>
     public class PingFederateAuthenticationMiddleware : AuthenticationMiddleware<PingFederateAuthenticationOptions>
     {
+        #region Fields
+
+        /// <summary>The http client.</summary>
         private readonly HttpClient httpClient;
+
+        /// <summary>The logger.</summary>
         private readonly ILogger logger;
 
-        public PingFederateAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app,
+        #endregion
+
+        #region Constructors and Destructors
+
+        /// <summary>Initializes a new instance of the <see cref="PingFederateAuthenticationMiddleware"/> class.</summary>
+        /// <param name="next">The next.</param>
+        /// <param name="app">The app.</param>
+        /// <param name="options">The options.</param>
+        /// <exception cref="ArgumentException">If any of the required parameters is empty</exception>
+        public PingFederateAuthenticationMiddleware(
+            OwinMiddleware next, 
+            IAppBuilder app, 
             PingFederateAuthenticationOptions options)
             : base(next, options)
         {
-            if (String.IsNullOrWhiteSpace(Options.ClientId))
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-                    Resources.Exception_OptionMustBeProvided, "ClientId"));
-            if (String.IsNullOrWhiteSpace(Options.ClientSecret))
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-                    Resources.Exception_OptionMustBeProvided, "ClientSecret"));
-            if (String.IsNullOrWhiteSpace(Options.PingFederateUrl))
-                throw new ArgumentException(String.Format(CultureInfo.CurrentCulture,
-                    Resources.Exception_OptionMustBeProvided, "PingFederateUrl"));
+            if (string.IsNullOrWhiteSpace(this.Options.ClientId))
+            {
+                throw new ArgumentException(
+                    string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ClientId"));
+            }
+
+            if (string.IsNullOrWhiteSpace(this.Options.ClientSecret))
+            {
+                throw new ArgumentException(
+                    string.Format(CultureInfo.CurrentCulture, Resources.Exception_OptionMustBeProvided, "ClientSecret"));
+            }
+
+            if (string.IsNullOrWhiteSpace(this.Options.PingFederateUrl))
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture, 
+                        Resources.Exception_OptionMustBeProvided, 
+                        "PingFederateUrl"));
+            }
 
             this.logger = app.CreateLogger<PingFederateAuthenticationMiddleware>();
 
-            if (Options.Provider == null)
-                Options.Provider = new PingFederateAuthenticationProvider();
-
-            if (Options.StateDataFormat == null)
+            if (this.Options.Provider == null)
             {
-                IDataProtector dataProtector = app.CreateDataProtector(
-                    typeof (PingFederateAuthenticationMiddleware).FullName,
-                    Options.AuthenticationType, "v1");
-                Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
+                this.Options.Provider = new PingFederateAuthenticationProvider();
             }
 
-            if (String.IsNullOrEmpty(Options.SignInAsAuthenticationType))
-                Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
-
-            this.httpClient = new HttpClient(this.ResolveHttpMessageHandler(Options))
+            if (this.Options.StateDataFormat == null)
             {
-                Timeout = Options.BackchannelTimeout,
-                MaxResponseContentBufferSize = 1024*1024*10,
-            };
+                var dataProtector = app.CreateDataProtector(
+                    typeof(PingFederateAuthenticationMiddleware).FullName, 
+                    this.Options.AuthenticationType, 
+                    "v1");
+                this.Options.StateDataFormat = new PropertiesDataFormat(dataProtector);
+            }
+
+            if (string.IsNullOrEmpty(this.Options.SignInAsAuthenticationType))
+            {
+                this.Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
+            }
+
+            this.httpClient = new HttpClient(this.ResolveHttpMessageHandler(this.Options))
+                                  {
+                                      Timeout =
+                                          this.Options
+                                          .BackchannelTimeout, 
+                                      MaxResponseContentBufferSize
+                                          = 1024 * 1024 * 10, 
+                                  };
+
+            if (this.Options.AuthenticationHandlerFactory == null)
+            {
+                this.Options.AuthenticationHandlerFactory = new PingFederateAuthenticationHandlerFactory(this.httpClient, this.logger);
+            }
+
             this.httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin PingFederate middleware");
             this.httpClient.DefaultRequestHeaders.ExpectContinue = false;
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         ///     Provides the <see cref="T:Microsoft.Owin.Security.Infrastructure.AuthenticationHandler" /> object for processing
@@ -64,16 +116,21 @@
         /// </summary>
         /// <returns>
         ///     An <see cref="T:Microsoft.Owin.Security.Infrastructure.AuthenticationHandler" /> configured with the
-        ///     <see cref="T:Owin.Security.Providers.PingFederate.PingFederateAuthenticationOptions" /> supplied to the constructor.
+        ///     <see cref="T:Owin.Security.Providers.PingFederate.PingFederateAuthenticationOptions" /> supplied to the
+        ///     constructor.
         /// </returns>
         protected override AuthenticationHandler<PingFederateAuthenticationOptions> CreateHandler()
         {
-            return new PingFederateAuthenticationHandler(this.httpClient, this.logger);
+            return this.Options.AuthenticationHandlerFactory.CreateHandler();
         }
 
+        /// <summary>The resolve http message handler.</summary>
+        /// <param name="options">The options.</param>
+        /// <returns>The <see cref="HttpMessageHandler"/>.</returns>
+        /// <exception cref="InvalidOperationException">If the web request handler is null</exception>
         private HttpMessageHandler ResolveHttpMessageHandler(PingFederateAuthenticationOptions options)
         {
-            HttpMessageHandler handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
+            var handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
 
             // If they provided a validator, apply it or fail.
             if (options.BackchannelCertificateValidator != null)
@@ -84,10 +141,13 @@
                 {
                     throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
                 }
+
                 webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
             }
 
             return handler;
         }
+
+        #endregion
     }
 }

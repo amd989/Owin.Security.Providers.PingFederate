@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MetadataEndpoints.cs" company="ShiftMe, Inc.">
+//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Owin.Security.Providers.PingFederate.Messages
 {
@@ -10,7 +10,8 @@ namespace Owin.Security.Providers.PingFederate.Messages
 
     using Newtonsoft.Json;
 
-    class MetadataEndpoints
+    /// <summary>The metadata endpoints.</summary>
+    public class MetadataEndpoints
     {
         #region Public Properties
 

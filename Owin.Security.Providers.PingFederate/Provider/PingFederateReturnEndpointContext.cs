@@ -1,4 +1,8 @@
-// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright company="ShiftMe, Inc." file="PingFederateReturnEndpointContext.cs">
+//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Owin.Security.Providers.PingFederate.Provider
 {
@@ -11,8 +15,7 @@ namespace Owin.Security.Providers.PingFederate.Provider
     /// </summary>
     public class PingFederateReturnEndpointContext : ReturnEndpointContext
     {
-        /// <summary>
-        /// 
+        /// <summary>Initializes a new instance of the <see cref="PingFederateReturnEndpointContext"/> class. 
         /// </summary>
         /// <param name="context">OWIN environment</param>
         /// <param name="ticket">The authentication ticket</param>
