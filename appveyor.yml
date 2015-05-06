@@ -11,7 +11,7 @@ branches:
 configuration: Release
 platform: Any CPU  
 artifacts:
-- path: /.*\.nupkg/
+- path: '*.nupkg'
   name: nuget
 build:
   project: Owin.Security.Providers.PingFederate.sln
