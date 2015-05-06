@@ -23,6 +23,6 @@
         </dependencies>
     </metadata>
     <files>
-        <file src="..\Owin.Security.Providers.PingFederate\bin\Release\Owin.Security.Providers.PingFederate.dll" target="lib\net45\Owin.Security.Providers.PingFederate.dll" />
+        <file src="Owin.Security.Providers.PingFederate\bin\Release\Owin.Security.Providers.PingFederate.dll" target="lib\net45\Owin.Security.Providers.PingFederate.dll" />
     </files>
 </package>
