@@ -1,5 +1,5 @@
 $root = (split-path -parent $MyInvocation.MyCommand.Definition) + '\..'
-$version = [System.Reflection.Assembly]::LoadFile("$root\Owin.Security.Providers.PingFederate\bin\Release\Owin.Security.Providers.PingFederate.dll").GetName().Version
+$version = [System.Reflection.Assembly]::LoadFile("$root\owin-security-providers-pingfederate\bin\Release\Owin.Security.Providers.PingFederate.dll").GetName().Version
 $versionStr = "{0}.{1}.{2}" -f ($version.Major, $version.Minor, $version.Build)
 
 Write-Host "Setting .nuspec version tag to $versionStr"

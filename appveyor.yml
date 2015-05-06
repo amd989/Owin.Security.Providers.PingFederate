@@ -1,14 +1,16 @@
 version: 1.0.{build}
-
 assembly_info:
   patch: true
   file: AssemblyInfo.*
   assembly_version: "{version}"
   assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
-
+  assembly_informational_version: "{version}"  
+branches:
+  only:
+  - master  
+configuration: Release
+platform: Any CPU  
 build:
   project: Owin.Security.Providers.PingFederate.sln
-
 after_test:
   - ps: .\.nuget\pack.ps1
