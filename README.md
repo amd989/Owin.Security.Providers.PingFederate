@@ -1,4 +1,7 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/5f7gyucnoq0b8rld/branch/master?svg=true)](https://ci.appveyor.com/project/amd989/owin-security-providers-pingfederate/branch/master)
 
+[![Nuget](https://img.shields.io/nuget/v/Owin.Security.Providers.PingFederate.svg)](https://www.nuget.org/packages/Owin.Security.Providers.PingFederate)
+[![Nuget](https://img.shields.io/nuget/dt/Owin.Security.Providers.PingFederate.svg)](https://www.nuget.org/packages/Owin.Security.Providers.PingFederate)
 
 # Owin.Security.Providers.PingFederate
 
