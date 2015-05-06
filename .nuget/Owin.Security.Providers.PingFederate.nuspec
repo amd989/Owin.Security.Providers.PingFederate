@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Owin.Security.Providers.PingFederate</id>
+        <version>$version$</version>
+        <title>PingFederate OWIN Middleware OpenIdConnect Client</title>
+        <authors>Alejandro Mora</authors>
+        <owners>Alejandro Mora</owners>
+        <projectUrl>https://github.com/amd989/Owin.Security.Providers.PingFederate</projectUrl>
+        <iconUrl>http://alejandro.md/publish/OpenIdConnect/logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>The PingFederate OWIN Middleware OpenIdConnect Client allows your C# application to take advantage of OWIN to start authentication with PingFederate using the OpenIdConnect Authentication module they provide.</description>
+        <summary />
+        <releaseNotes />
+        <copyright />
+        <language>en-US</language>
+        <tags>PingFederate OWIN OpenIdConnect</tags>
+        <dependencies>
+            <group targetFramework=".NETFramework4.5">
+                <dependency id="Microsoft.Owin.Security" version="3.0.0" />
+                <dependency id="Newtonsoft.Json" version="6.0.5" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\Owin.Security.Providers.PingFederate\bin\Release\Owin.Security.Providers.PingFederate.dll" target="lib\net45\Owin.Security.Providers.PingFederate.dll" />
+    </files>
+</package>

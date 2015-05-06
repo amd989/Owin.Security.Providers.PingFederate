@@ -21,7 +21,7 @@ namespace Owin.Security.Providers.PingFederate
         #region Constants
 
         /// <summary>The authorization end point.</summary>
-        public const string AuthorizationEndPoint = "/as/authorization.oauth2";
+        public const string AuthorizationEndpoint = "/as/authorization.oauth2";
 
         /// <summary>The open id connect metadata endpoint.</summary>
         public const string OpenIdConnectMetadataEndpoint = "/.well-known/openid-configuration";
@@ -46,8 +46,12 @@ namespace Owin.Security.Providers.PingFederate
             this.AuthenticationMode = AuthenticationMode.Passive;
             this.Scope = new List<string> { "openid" };
             this.BackchannelTimeout = TimeSpan.FromSeconds(60);
-            this.Endpoints = new PingFederateAuthenticationEndpoints();
+            this.Endpoints = new PingFederateAuthenticationEndpoints()
+                                 {
+                                     MetadataEndpoint = OpenIdConnectMetadataEndpoint
+                                 };
             this.RequestUserInfo = true;
+            this.DiscoverMetadata = true;
         }
 
         #endregion
@@ -165,6 +169,10 @@ namespace Owin.Security.Providers.PingFederate
         /// <summary>Gets or sets a value indicating whether to request user info.</summary>
         public bool RequestUserInfo { get; set; }
 
+
+        /// <summary>Gets or sets a value indicating whether to discover the endpoints using the Metadata Endpoint in PingFederate. Default is true</summary>
+        public bool DiscoverMetadata { get; set; }
+
         /// <summary>
         ///     Gets or sets a list of permissions to request.
         /// </summary>
@@ -198,8 +206,9 @@ namespace Owin.Security.Providers.PingFederate
 
             /// <summary>
             ///     Gets or sets This public endpoint provides metadata needed for an OAuth client to interface with PingFederate using the OpenID
-            ///     Connect protocol.
+            ///     Connect protocol. 
             /// </summary>
+            /// <remarks>If this property is set, the middleware will attempt to discover the other endpoints by calling PingFederate.</remarks>
             public string MetadataEndpoint { get; set; }
 
             /// <summary>

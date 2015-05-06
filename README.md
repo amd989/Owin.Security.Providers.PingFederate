@@ -1,10 +1,12 @@
+
+
 # Owin.Security.Providers.PingFederate
 
 The PingFederate OWIN Middleware OpenIdConnect Client allows your C# Web Application to take advantage of OWIN to start authentication with Ping Federate using the OpenId Connect Authentication module they provide.
 
 Configuration in Ping has to be made to support this client. You need to have the OAuth2 module enabled, configure Clients, configure mappings, poliecies, adapters, etc. Everything is explained in the PingFederate documentation. If you have problems or questions contact me using the Issues tab.
 
-I will be adding samples and a full rundown on how to use this client soon. 
+Samples have been added, please refer to them to get an idea on how to set up the Middleware. Also refer to the main project page for an step by step.
 
 ## Usage:
 

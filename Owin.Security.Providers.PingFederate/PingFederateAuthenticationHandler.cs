@@ -102,7 +102,7 @@ namespace Owin.Security.Providers.PingFederate
                 await this.Options.Provider.Authenticating(context);
 
                 var baseUri = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
-                var currentUri = baseUri + this.Request.Path; // this.Request.QueryString; 
+                var currentUri = baseUri + this.Request.Path;
                 var redirectUri = baseUri + this.Options.CallbackPath;
 
                 var properties = challenge.Properties;
@@ -150,8 +150,7 @@ namespace Owin.Security.Providers.PingFederate
                 var requestParameters = MergeAdditionalKeyValuePairsIntoExplicitKeyValuePairs(
                     explicitParameters, 
                     this.Options.AdditionalParameters);
-                var authorizationEndpoint = this.Options.Endpoints.AuthorizationEndpoint
-                                            + requestParameters.ToQueryString();
+                var authorizationEndpoint = this.Options.Endpoints.AuthorizationEndpoint + requestParameters.ToQueryString();
                 this.Response.Redirect(authorizationEndpoint);
             }
         }
@@ -366,9 +365,9 @@ namespace Owin.Security.Providers.PingFederate
         /// <returns>The <see cref="Task"/>.</returns>
         private async Task DoMetadataDiscoveryAsync()
         {
-            if (!string.IsNullOrEmpty(this.Options.Endpoints.MetadataEndpoint))
+            if (this.Options.DiscoverMetadata)
             {
-                var response = await this.httpClient.GetStringAsync(this.Options.Endpoints.MetadataEndpoint);
+                var response = await this.httpClient.GetStringAsync(this.Options.PingFederateUrl + this.Options.Endpoints.MetadataEndpoint);
                 var endpoints = JsonConvert.DeserializeObject<MetadataEndpoints>(response);
                 this.Options.Endpoints.AuthorizationEndpoint = endpoints.AuthorizationEndpoint;
                 this.Options.Endpoints.TokenEndpoint = endpoints.TokenEndpoint;
