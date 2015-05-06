@@ -10,6 +10,7 @@ branches:
   - master  
 configuration: Release
 platform: Any CPU  
+artifacts:
 build:
   project: Owin.Security.Providers.PingFederate.sln
 after_test:
@@ -19,6 +20,4 @@ deploy:
   api_key:
     secure: URwllFXj7DocZxjh46r88t4NJb1ApHqjhWHWNTF3+Z0LxJ53COkdFIuEdUT3NQTA
   artifact: /.*\.nupkg/
-  on:
-    branch: master
   
