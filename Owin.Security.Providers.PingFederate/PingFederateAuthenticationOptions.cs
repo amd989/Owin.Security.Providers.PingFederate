@@ -4,6 +4,9 @@
 // </copyright>
 // <author>Alejandro Mora</author>
 // --------------------------------------------------------------------------------------------------------------------
+
+using Owin.Security.Providers.PingFederate.Enum;
+
 namespace Owin.Security.Providers.PingFederate
 {
     using System;
@@ -52,6 +55,7 @@ namespace Owin.Security.Providers.PingFederate
                                  };
             this.RequestUserInfo = true;
             this.DiscoverMetadata = true;
+            ResponseType = ResponseType.Code;
         }
 
         #endregion
@@ -103,6 +107,19 @@ namespace Owin.Security.Providers.PingFederate
         ///     Default value is "/signin-pingfederate".
         /// </summary>
         public PathString CallbackPath { get; set; }
+
+
+        /// <summary>
+        ///     Gets or sets the BasePath. If not set the application will determine the base path.
+        ///  
+        /// </summary>
+        public string BasePath { get; set; }
+
+
+        /// <summary>
+        ///     Gets or sets the Response Type. Defaults to Code
+        /// </summary>
+        public ResponseType ResponseType { get; set; }
 
         /// <summary>
         ///     Gets or sets the text that the user can display on a sign in user interface.
