@@ -5,7 +5,7 @@
 // <author>Alejandro Mora</author>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Owin.Security.Providers.PingFederate.Enum;
+using Owin.Security.Providers.PingFederate.Enums;
 
 namespace Owin.Security.Providers.PingFederate
 {

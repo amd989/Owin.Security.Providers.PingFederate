@@ -61,7 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="Enum\ResponseType.cs" />
+    <Compile Include="Enums\EnumExtensions.cs" />
+    <Compile Include="Enums\ResponseType.cs" />
     <Compile Include="Messages\MetadataEndpoints.cs" />
     <Compile Include="PingFederateAuthenticationExtensions.cs" />
     <Compile Include="PingFederateAuthenticationHandler.cs" />

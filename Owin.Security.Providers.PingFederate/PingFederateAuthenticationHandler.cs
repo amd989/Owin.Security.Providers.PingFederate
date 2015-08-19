@@ -5,7 +5,6 @@
 // <author>Alejandro Mora</author>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Owin.Security.Providers.PingFederate.Enum;
 
 namespace Owin.Security.Providers.PingFederate
 {
@@ -28,6 +27,7 @@ namespace Owin.Security.Providers.PingFederate
 
     using Owin.Security.Providers.PingFederate.Messages;
     using Owin.Security.Providers.PingFederate.Provider;
+    using Owin.Security.Providers.PingFederate.Enums;
 
     /// <summary>The ping federate authentication handler.</summary>
     public class PingFederateAuthenticationHandler : AuthenticationHandler<PingFederateAuthenticationOptions>
@@ -136,12 +136,8 @@ namespace Owin.Security.Providers.PingFederate
                     prompt = values[0];
                 }
 
-                var responseType =
-                    Options.ResponseType ==
-                        ResponseType.Code
-                            ? Constants.OAuth2Constants.ResponseTypes.Code
-                            : Constants.OAuth2Constants.ResponseTypes.Token;
-
+                var responseType = Options.ResponseType.PingFederateName();
+                    
                 var explicitParameters = new Dictionary<string, string>
                                              {
                                                  { Constants.OAuth2Constants.ResponseType, responseType }, 
