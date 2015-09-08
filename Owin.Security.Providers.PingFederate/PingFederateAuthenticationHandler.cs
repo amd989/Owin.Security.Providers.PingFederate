@@ -4,6 +4,8 @@
 // </copyright>
 // <author>Alejandro Mora</author>
 // --------------------------------------------------------------------------------------------------------------------
+
+
 namespace Owin.Security.Providers.PingFederate
 {
     using System;
@@ -25,6 +27,7 @@ namespace Owin.Security.Providers.PingFederate
 
     using Owin.Security.Providers.PingFederate.Messages;
     using Owin.Security.Providers.PingFederate.Provider;
+    using Owin.Security.Providers.PingFederate.Enums;
 
     /// <summary>The ping federate authentication handler.</summary>
     public class PingFederateAuthenticationHandler : AuthenticationHandler<PingFederateAuthenticationOptions>
@@ -101,7 +104,7 @@ namespace Owin.Security.Providers.PingFederate
                 var context = new PingFederateAuthenticatingContext(this.Context, this.Options);
                 await this.Options.Provider.Authenticating(context);
 
-                var baseUri = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
+                var baseUri = !string.IsNullOrWhiteSpace(Options.BasePath) ? Options.BasePath : this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
                 var currentUri = baseUri + this.Request.Path;
                 var redirectUri = baseUri + this.Options.CallbackPath;
 
@@ -133,9 +136,11 @@ namespace Owin.Security.Providers.PingFederate
                     prompt = values[0];
                 }
 
+                var responseType = Options.ResponseType.PingFederateName();
+                    
                 var explicitParameters = new Dictionary<string, string>
                                              {
-                                                 { Constants.OAuth2Constants.ResponseType, Constants.OAuth2Constants.ResponseTypes.Code }, 
+                                                 { Constants.OAuth2Constants.ResponseType, responseType }, 
                                                  { Constants.OAuth2Constants.ClientId, Uri.EscapeDataString(this.Options.ClientId) }, 
                                                  { Constants.OAuth2Constants.RedirectUri, Uri.EscapeDataString(redirectUri) }, 
                                                  { Constants.OAuth2Constants.Scope, Uri.EscapeDataString(scope) }, 
