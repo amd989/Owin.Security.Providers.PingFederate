@@ -1,9 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PingFederateAuthenticationExtensions.cs" company="ShiftMe, Inc.">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
 // <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace Owin.Security.Providers.PingFederate
 {
     using System;
@@ -26,12 +33,10 @@ namespace Owin.Security.Providers.PingFederate
             {
                 throw new ArgumentNullException("parameters");
             }
-
-            var joined = string.Join(
-                "&", 
-                parameters.Where(pair => !string.IsNullOrEmpty(pair.Value))
-                    .Select(pair => string.Format(CultureInfo.InvariantCulture, "{0}={1}", pair.Key, pair.Value)));
-            return string.Format(CultureInfo.InvariantCulture, "?{0}", joined);
+            
+            // Avoiding URL encoding the query string parameters as it is NOT compatible with Ping Federate.
+            var query = string.Join("&", parameters.Where(pair => !string.IsNullOrEmpty(pair.Value)).Select(item => string.Format(CultureInfo.InvariantCulture, "{0}={1}", item.Key, item.Value)).ToArray());
+            return string.IsNullOrEmpty(query) ? string.Empty : "?" + query;
         }
 
         /// <summary>The use ping federate authentication.</summary>

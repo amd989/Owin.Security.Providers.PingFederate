@@ -1,9 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PingFederateAuthenticationOptions.cs" company="ShiftMe, Inc.">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
 // <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace Owin.Security.Providers.PingFederate
 {
     using System;
@@ -21,7 +28,7 @@ namespace Owin.Security.Providers.PingFederate
         #region Constants
 
         /// <summary>The authorization end point.</summary>
-        public const string AuthorizationEndpoint = "/as/authorization.oauth2";
+        public const string AuthorizationEndPoint = "/as/authorization.oauth2";
 
         /// <summary>The open id connect metadata endpoint.</summary>
         public const string OpenIdConnectMetadataEndpoint = "/.well-known/openid-configuration";
@@ -38,18 +45,19 @@ namespace Owin.Security.Providers.PingFederate
 
         /// <summary>Initializes a new instance of the <see cref="PingFederateAuthenticationOptions" /> class.</summary>
         public PingFederateAuthenticationOptions()
-            : base("PingFederate")
+            : base(Constants.DefaultAuthenticationType)
         {
-            this.Caption = Constants.DefaultAuthenticationType;
+            this.Caption = "Ping Federate";
             this.CallbackPath = new PathString("/signin-pingfederate");
-            this.PartnetIdpId = string.Empty;
+            this.PartnerIdpId = string.Empty;
             this.AuthenticationMode = AuthenticationMode.Passive;
             this.Scope = new List<string> { "openid" };
             this.BackchannelTimeout = TimeSpan.FromSeconds(60);
-            this.Endpoints = new PingFederateAuthenticationEndpoints()
+            this.Endpoints = new PingFederateAuthenticationEndpoints
                                  {
                                      MetadataEndpoint = OpenIdConnectMetadataEndpoint
                                  };
+            this.ErrorPath = "Error/LoginFailure";
             this.RequestUserInfo = true;
             this.DiscoverMetadata = true;
         }
@@ -151,7 +159,7 @@ namespace Owin.Security.Providers.PingFederate
         ///     Gets or sets a PingFederate OAuth AS parameter indicating the Entity ID/Connection ID of the IdP with whom to initiate Browser
         ///     SSO for user authentication.
         /// </summary>
-        public string PartnetIdpId { get; set; }
+        public string PartnerIdpId { get; set; }
 
         /// <summary>
         ///     Gets or sets the PingFederate server URL
@@ -169,7 +177,6 @@ namespace Owin.Security.Providers.PingFederate
         /// <summary>Gets or sets a value indicating whether to request user info.</summary>
         public bool RequestUserInfo { get; set; }
 
-
         /// <summary>Gets or sets a value indicating whether to discover the endpoints using the Metadata Endpoint in PingFederate. Default is true</summary>
         public bool DiscoverMetadata { get; set; }
 
@@ -177,6 +184,9 @@ namespace Owin.Security.Providers.PingFederate
         ///     Gets or sets a list of permissions to request.
         /// </summary>
         public IList<string> Scope { get; set; }
+
+        /// <summary>Gets or sets the error path.</summary>
+        public string ErrorPath { get; set; }
 
         /// <summary>
         ///     Gets or sets the name of another authentication middleware which will be responsible for actually issuing a user
@@ -190,44 +200,5 @@ namespace Owin.Security.Providers.PingFederate
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
         #endregion
-
-        /// <summary>The ping federate authentication endpoints.</summary>
-        public class PingFederateAuthenticationEndpoints
-        {
-            #region Public Properties
-
-            /// <summary>
-            ///     Gets or sets Endpoint which is used to redirect users to request PingFederate access
-            /// </summary>
-            /// <remarks>
-            ///     Defaults to <see cref="PingFederateAuthenticationOptions.PingFederateUrl" />/as/authorization.oauth2
-            /// </remarks>
-            public string AuthorizationEndpoint { get; set; }
-
-            /// <summary>
-            ///     Gets or sets This public endpoint provides metadata needed for an OAuth client to interface with PingFederate using the OpenID
-            ///     Connect protocol. 
-            /// </summary>
-            /// <remarks>If this property is set, the middleware will attempt to discover the other endpoints by calling PingFederate.</remarks>
-            public string MetadataEndpoint { get; set; }
-
-            /// <summary>
-            ///     Gets or sets Endpoint which is used to exchange code for access token
-            /// </summary>
-            /// <remarks>
-            ///     Defaults to /as/token.oauth2
-            /// </remarks>
-            public string TokenEndpoint { get; set; }
-
-            /// <summary>
-            ///     Gets or sets Endpoint which is used to obtain user information after authentication
-            /// </summary>
-            /// <remarks>
-            ///     Defaults to /idp/userinfo.openid
-            /// </remarks>
-            public string UserInfoEndpoint { get; set; }
-
-            #endregion
-        }
     }
 }

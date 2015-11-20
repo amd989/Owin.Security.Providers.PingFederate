@@ -1,7 +1,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright company="ShiftMe, Inc." file="PingFederateReturnEndpointContext.cs">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
+// <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Owin.Security.Providers.PingFederate.Provider

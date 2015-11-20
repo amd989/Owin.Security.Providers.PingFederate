@@ -1,20 +1,30 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PingFederateAuthenticationHandler.cs" company="ShiftMe, Inc.">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
 // <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace Owin.Security.Providers.PingFederate
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
+    using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
 
+    using Microsoft.Owin;
     using Microsoft.Owin.Infrastructure;
     using Microsoft.Owin.Logging;
     using Microsoft.Owin.Security;
@@ -33,6 +43,12 @@ namespace Owin.Security.Providers.PingFederate
 
         /// <summary>The xml schema string.</summary>
         private const string XmlSchemaString = "http://www.w3.org/2001/XMLSchema#string";
+
+        /// <summary>The ping error code.</summary>
+        private const string PingErrorCode = "error";
+
+        /// <summary>The ping error description code.</summary>
+        private const string PingErrorDescriptionCode = "error_description";
 
         #endregion
 
@@ -102,7 +118,7 @@ namespace Owin.Security.Providers.PingFederate
                 await this.Options.Provider.Authenticating(context);
 
                 var baseUri = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
-                var currentUri = baseUri + this.Request.Path;
+                var currentUri = baseUri + this.Request.Path + this.Request.QueryString; 
                 var redirectUri = baseUri + this.Options.CallbackPath;
 
                 var properties = challenge.Properties;
@@ -140,16 +156,14 @@ namespace Owin.Security.Providers.PingFederate
                                                  { Constants.OAuth2Constants.RedirectUri, Uri.EscapeDataString(redirectUri) }, 
                                                  { Constants.OAuth2Constants.Scope, Uri.EscapeDataString(scope) }, 
                                                  { Constants.OAuth2Constants.State, Uri.EscapeDataString(state) }, 
-                                                 { Constants.OAuth2Constants.PartnerIdpId, Uri.EscapeDataString(this.Options.PartnetIdpId ?? string.Empty) }, 
+                                                 { Constants.OAuth2Constants.PartnerIdpId, Uri.EscapeDataString(this.Options.PartnerIdpId ?? string.Empty) }, 
                                                  { Constants.OAuth2Constants.IdpAdapterId, Uri.EscapeDataString(this.Options.IdpAdapterId ?? string.Empty) }, 
                                                  { Constants.OAuth2Constants.Nonce, Uri.EscapeDataString(nonce) }, 
                                                  { Constants.OAuth2Constants.Prompt, Uri.EscapeDataString(prompt) }, 
                                                  { Constants.OAuth2Constants.AcrValues, Uri.EscapeDataString(acrValues) } 
                                              };
 
-                var requestParameters = MergeAdditionalKeyValuePairsIntoExplicitKeyValuePairs(
-                    explicitParameters, 
-                    this.Options.AdditionalParameters);
+                var requestParameters = MergeAdditionalKeyValuePairsIntoExplicitKeyValuePairs(explicitParameters, this.Options.AdditionalParameters);
                 var authorizationEndpoint = this.Options.Endpoints.AuthorizationEndpoint + requestParameters.ToQueryString();
                 this.Response.Redirect(authorizationEndpoint);
             }
@@ -231,19 +245,29 @@ namespace Owin.Security.Providers.PingFederate
                 requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 requestMessage.Content = new FormUrlEncodedContent(body);
                 var tokenResponse = await this.httpClient.SendAsync(requestMessage);
-                tokenResponse.EnsureSuccessStatusCode();
                 var text = await tokenResponse.Content.ReadAsStringAsync();
 
-                // Deserializes the token response
-                var response = JsonConvert.DeserializeObject<dynamic>(text);
-                var accessToken = (string)response.access_token;
-                string identityToken = response.id_token;
-                string refreshToken = null;
-                if (response.refresh_token != null)
+                // Check if there was an error in the response
+                if (!tokenResponse.IsSuccessStatusCode)
                 {
-                    refreshToken = (string)response.refresh_token;
+                    var status = tokenResponse.StatusCode;
+                    if (status == HttpStatusCode.BadRequest)
+                    {
+                        // Deserialize and Log Error
+                        var errorResponse = JsonConvert.DeserializeObject<TokenEndpoint>(text);
+                        this.LogErrorResult(errorResponse.Error, errorResponse.ErrorDescription);
+                    }
+
+                    // Throw error
+                    tokenResponse.EnsureSuccessStatusCode();
                 }
 
+                // Deserializes the token response if successfull
+                var response = JsonConvert.DeserializeObject<TokenEndpoint>(text);
+                var accessToken = response.AccessToken;
+                var identityToken = response.IdToken;
+                var refreshToken = response.RefreshToken;
+                
                 // Get the PingFederate user
                 JObject user = null;
                 if (this.Options.RequestUserInfo)
@@ -321,7 +345,7 @@ namespace Owin.Security.Providers.PingFederate
             }
             catch (Exception ex)
             {
-                this.logger.WriteError(ex.Message);
+                this.logger.WriteError(ex.Message, ex);
             }
 
             return new AuthenticationTicket(null, properties);
@@ -334,7 +358,7 @@ namespace Owin.Security.Providers.PingFederate
         private static string EncodeCredential(string userName, string password)
         {
             var encoding = Encoding.GetEncoding("iso-8859-1");
-            var credential = string.Format("{0}:{1}", userName, password);
+            var credential = string.Format(CultureInfo.InvariantCulture, "{0}:{1}", userName, password);
             return Convert.ToBase64String(encoding.GetBytes(credential));
         }
 
@@ -351,14 +375,42 @@ namespace Owin.Security.Providers.PingFederate
             // no need to iterate if additional is null
             if (additionalProperties != null)
             {
-                merged =
-                    explicitProperties.Concat(
-                        additionalProperties.Where(add => !explicitProperties.ContainsKey(add.Key)))
+                merged = explicitProperties.Concat(additionalProperties.Where(add => !explicitProperties.ContainsKey(add.Key)))
                         .Where(a => !string.IsNullOrEmpty(a.Value))
                         .ToDictionary(final => final.Key, final => final.Value);
             }
 
             return merged;
+        }
+
+        /// <summary>Detects if the request has error messages in the form of 'error' and 'error_description'</summary>
+        /// <param name="request">The OWIN request.</param>
+        /// <param name="error">Output parameter with the code of the error.</param>
+        /// <param name="errorDescription">Output parameter with the error description.</param>
+        /// <returns>The <see cref="bool"/>.</returns>
+        private static bool RequestHasErrorMessages(IOwinRequest request, out string error, out string errorDescription)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
+            error = null;
+            errorDescription = null;
+            var query = request.Query;
+            var values = query.GetValues(PingErrorCode);
+            if (values != null && values.Count == 1)
+            {
+                error = values[0];
+            }
+
+            values = query.GetValues(PingErrorDescriptionCode);
+            if (values != null && values.Count == 1)
+            {
+                errorDescription = values[0];
+            }
+
+            return !string.IsNullOrEmpty(error) || !string.IsNullOrEmpty(errorDescription);
         }
 
         /// <summary>The do metadata discovery async.</summary>
@@ -368,7 +420,7 @@ namespace Owin.Security.Providers.PingFederate
             if (this.Options.DiscoverMetadata)
             {
                 var response = await this.httpClient.GetStringAsync(this.Options.PingFederateUrl + this.Options.Endpoints.MetadataEndpoint);
-                var endpoints = JsonConvert.DeserializeObject<MetadataEndpoints>(response);
+                var endpoints = JsonConvert.DeserializeObject<MetadataEndpoint>(response);
                 this.Options.Endpoints.AuthorizationEndpoint = endpoints.AuthorizationEndpoint;
                 this.Options.Endpoints.TokenEndpoint = endpoints.TokenEndpoint;
                 this.Options.Endpoints.UserInfoEndpoint = endpoints.UserInfoEndpoint;
@@ -382,15 +434,37 @@ namespace Owin.Security.Providers.PingFederate
             var callBack = this.Options.CallbackPath;
             if (callBack.HasValue && this.Request.Path.Value.Contains(callBack.Value))
             {
-                // TODO: error responses
+                // Check for error responses.
+                string error;
+                string errorDescription;
+                var isErrorRequest = RequestHasErrorMessages(this.Request, out error, out errorDescription);
+                if (isErrorRequest)
+                {
+                    // add a redirect hint that sign-in failed because of ping errors
+                    this.LogErrorResult(error, errorDescription);
+                    var errorPath = this.ErrorPath();
+                    errorPath = WebUtilities.AddQueryString(errorPath, PingErrorCode, error);
+                    errorPath = WebUtilities.AddQueryString(errorPath, PingErrorDescriptionCode, errorDescription);
+                    this.Response.Redirect(errorPath);
+                    return true;
+                }
+
+                // Authenticate
                 var ticket = await this.AuthenticateAsync();
                 if (ticket == null)
                 {
                     this.logger.WriteWarning("Invalid return state, unable to redirect.");
                     this.Response.StatusCode = 500;
+                    
+                    // add a redirect hint that sign-in failed in some way
+                    var errorPath = this.ErrorPath();
+                    errorPath = WebUtilities.AddQueryString(errorPath, PingErrorCode, "invalid return state");
+                    
+                    this.Response.Redirect(errorPath);
                     return true;
                 }
 
+                // Execute provider event
                 var context = new PingFederateReturnEndpointContext(this.Context, ticket)
                                   {
                                       SignInAsAuthenticationType = this.Options.SignInAsAuthenticationType,
@@ -401,20 +475,14 @@ namespace Owin.Security.Providers.PingFederate
 
                 if (context.SignInAsAuthenticationType != null && context.Identity != null)
                 {
+                    // Authentication Succeed
                     var grantIdentity = context.Identity;
-                    if (
-                        !string.Equals(
-                            grantIdentity.AuthenticationType, 
-                            context.SignInAsAuthenticationType, 
-                            StringComparison.Ordinal))
+                    if (!string.Equals(grantIdentity.AuthenticationType, context.SignInAsAuthenticationType, StringComparison.Ordinal))
                     {
-                        grantIdentity = new ClaimsIdentity(
-                            grantIdentity.Claims, 
-                            context.SignInAsAuthenticationType, 
-                            grantIdentity.NameClaimType, 
-                            grantIdentity.RoleClaimType);
+                        grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType, grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
                     }
 
+                    this.logger.WriteInformation(string.Format("Authentication successful for user: {0}", grantIdentity.Name));
                     this.Context.Authentication.SignIn(context.Properties, grantIdentity);
                 }
 
@@ -424,7 +492,8 @@ namespace Owin.Security.Providers.PingFederate
                     if (context.Identity == null)
                     {
                         // add a redirect hint that sign-in failed in some way
-                        redirectUri = WebUtilities.AddQueryString(redirectUri, "error", "access_denied");
+                        redirectUri = this.ErrorPath();
+                        redirectUri = WebUtilities.AddQueryString(redirectUri, PingErrorCode, "access_denied");
                     }
 
                     this.Response.Redirect(redirectUri);
@@ -436,6 +505,23 @@ namespace Owin.Security.Providers.PingFederate
 
             return false;
         }
+
+        /// <summary>The log error result.</summary>
+        /// <param name="error">The error.</param>
+        /// <param name="errorDescription">The error description.</param>
+        private void LogErrorResult(string error, string errorDescription)
+        {
+            this.logger.WriteError(string.Format(CultureInfo.InvariantCulture, "Ping Federate error occurred. error: {0} description: {1}", error, errorDescription));
+        }
+
+        /// <summary>The error path.</summary>
+        /// <returns>The <see cref="string"/>.</returns>
+        private string ErrorPath()
+        {
+            var baseUri = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
+            var redirectUri = baseUri + "/" + this.Options.ErrorPath;
+            return redirectUri;
+        }     
 
         #endregion
     }

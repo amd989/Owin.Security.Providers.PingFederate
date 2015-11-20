@@ -1,7 +1,14 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MetadataEndpoints.cs" company="ShiftMe, Inc.">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+// <copyright file="MetadataEndpoint.cs" company="ShiftMe, Inc.">
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
+// <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Owin.Security.Providers.PingFederate.Messages
@@ -11,7 +18,7 @@ namespace Owin.Security.Providers.PingFederate.Messages
     using Newtonsoft.Json;
 
     /// <summary>The metadata endpoints.</summary>
-    public class MetadataEndpoints
+    public class MetadataEndpoint
     {
         #region Public Properties
 
@@ -39,7 +46,7 @@ namespace Owin.Security.Providers.PingFederate.Messages
 
         /// <summary>Gets or sets the JWKS URI.</summary>
         [JsonProperty(PropertyName = "jwks_uri")]
-        public string JwksUri { get; set; }
+        public string JsonWebKeysUri { get; set; }
 
         /// <summary>Gets or sets a value indicating whether request parameter supported.</summary>
         [JsonProperty(PropertyName = "request_parameter_supported")]

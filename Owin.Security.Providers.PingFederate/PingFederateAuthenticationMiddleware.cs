@@ -1,9 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PingFederateAuthenticationMiddleware.cs" company="ShiftMe, Inc.">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
 // <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace Owin.Security.Providers.PingFederate
 {
     using System;
@@ -40,10 +47,7 @@ namespace Owin.Security.Providers.PingFederate
         /// <param name="app">The app.</param>
         /// <param name="options">The options.</param>
         /// <exception cref="ArgumentException">If any of the required parameters is empty</exception>
-        public PingFederateAuthenticationMiddleware(
-            OwinMiddleware next, 
-            IAppBuilder app, 
-            PingFederateAuthenticationOptions options)
+        public PingFederateAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, PingFederateAuthenticationOptions options)
             : base(next, options)
         {
             if (string.IsNullOrWhiteSpace(this.Options.ClientId))
@@ -88,13 +92,9 @@ namespace Owin.Security.Providers.PingFederate
                 this.Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
 
-            this.httpClient = new HttpClient(this.ResolveHttpMessageHandler(this.Options))
+            this.httpClient = new HttpClient(ResolveHttpMessageHandler(this.Options))
                                   {
-                                      Timeout =
-                                          this.Options
-                                          .BackchannelTimeout, 
-                                      MaxResponseContentBufferSize
-                                          = 1024 * 1024 * 10, 
+                                      Timeout = this.Options.BackchannelTimeout, MaxResponseContentBufferSize = 1024 * 1024 * 10, 
                                   };
 
             if (this.Options.AuthenticationHandlerFactory == null)
@@ -128,7 +128,7 @@ namespace Owin.Security.Providers.PingFederate
         /// <param name="options">The options.</param>
         /// <returns>The <see cref="HttpMessageHandler"/>.</returns>
         /// <exception cref="InvalidOperationException">If the web request handler is null</exception>
-        private HttpMessageHandler ResolveHttpMessageHandler(PingFederateAuthenticationOptions options)
+        private static HttpMessageHandler ResolveHttpMessageHandler(PingFederateAuthenticationOptions options)
         {
             var handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
 

@@ -1,9 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Constants.cs" company="ShiftMe, Inc.">
-//   Copyright © 2015 ShiftMe, Inc.  All rights reserved.
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
 // </copyright>
 // <author>Alejandro Mora</author>
+// <summary>
+//   
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace Owin.Security.Providers.PingFederate
 {
     /// <summary>The constants.</summary>
@@ -16,7 +23,7 @@ namespace Owin.Security.Providers.PingFederate
 
         #endregion
 
-        /// <summary>The o auth 2 constants.</summary>
+        /// <summary>The OAuth2 constants.</summary>
         public static class OAuth2Constants
         {
             #region Constants
@@ -135,7 +142,7 @@ namespace Owin.Security.Providers.PingFederate
                 /// <summary>The refresh token.</summary>
                 public const string RefreshToken = "refresh_token";
 
-                /// <summary>The saml 2.</summary>
+                /// <summary>The SAML2.</summary>
                 public const string Saml2 = "urn:ietf:params:oauth:grant-type:saml2-bearer";
 
                 /// <summary>The token validation.</summary>
