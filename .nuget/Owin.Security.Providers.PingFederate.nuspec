@@ -17,8 +17,8 @@
         <tags>PingFederate OWIN OpenIdConnect</tags>
         <dependencies>
             <group targetFramework=".NETFramework4.5">
-                <dependency id="Microsoft.Owin.Security" version="3.0.0" />
-                <dependency id="Newtonsoft.Json" version="6.0.5" />
+                <dependency id="Microsoft.Owin.Security" version="3.0.1" />
+                <dependency id="Newtonsoft.Json" version="7.0.1" />
             </group>
         </dependencies>
     </metadata>
