@@ -1,0 +1,34 @@
+﻿@using System.Security.Claims
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Claims</h2>
+        <p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var claim in ((ClaimsIdentity)User.Identity).Claims)
+                {
+                    <tr>
+                        <td>
+                            @claim.Type
+                        </td>
+                        <td >
+                            @claim.Value
+                        </td>
+                    </tr>
+                }
+                <tbody>
+            </table>
+        </p>
+    </div>
+</div>
