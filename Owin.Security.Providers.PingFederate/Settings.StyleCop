@@ -8,6 +8,7 @@
       <Value>oauth</Value>
       <Value>OAuth</Value>
       <Value>openid</Value>
+      <Value>pingidentity</Value>
       <Value>signin-pingfederate</Value>
       <Value>userinfo</Value>
     </CollectionProperty>

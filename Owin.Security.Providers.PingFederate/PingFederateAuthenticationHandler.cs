@@ -424,6 +424,9 @@ namespace Owin.Security.Providers.PingFederate
                 this.Options.Endpoints.AuthorizationEndpoint = endpoints.AuthorizationEndpoint;
                 this.Options.Endpoints.TokenEndpoint = endpoints.TokenEndpoint;
                 this.Options.Endpoints.UserInfoEndpoint = endpoints.UserInfoEndpoint;
+                this.Options.Endpoints.PingEndSessionEndpoint = endpoints.PingEndSessionEndpoint;
+                this.Options.Endpoints.PingRevokedSrisEndpoint = endpoints.PingRevokedSrisEndpoint;
+                this.Options.Endpoints.RevocationEndpoint = endpoints.RevocationEndpoint;
             }
         }
 

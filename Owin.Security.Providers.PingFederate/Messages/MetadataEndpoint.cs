@@ -6,14 +6,11 @@
 //   GNU General Public License for more details.
 // </copyright>
 // <author>Alejandro Mora</author>
-// <summary>
-//   
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace Owin.Security.Providers.PingFederate.Messages
 {
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
 
     using Newtonsoft.Json;
 
@@ -27,7 +24,7 @@ namespace Owin.Security.Providers.PingFederate.Messages
         public string AuthorizationEndpoint { get; set; }
 
         /// <summary>Gets or sets the claim types supported.</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
         [JsonProperty(PropertyName = "claim_types_supported")]
         public Collection<string> ClaimTypesSupported { get; set; }
 
@@ -36,7 +33,7 @@ namespace Owin.Security.Providers.PingFederate.Messages
         public bool ClaimsParameterSupported { get; set; }
 
         /// <summary>Gets or sets the id token signing algorithms values supported.</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
         [JsonProperty(PropertyName = "id_token_signing_alg_values_supported")]
         public Collection<string> IdTokenSigningAlgorithmValuesSupported { get; set; }
 
@@ -48,6 +45,14 @@ namespace Owin.Security.Providers.PingFederate.Messages
         [JsonProperty(PropertyName = "jwks_uri")]
         public string JsonWebKeysUri { get; set; }
 
+        /// <summary>Gets or sets the ping end session endpoint.</summary>
+        [JsonProperty(PropertyName = "ping_end_session_endpoint")]
+        public string PingEndSessionEndpoint { get; set; }
+
+        /// <summary>Gets or sets the ping revoked SRIS endpoint.</summary>
+        [JsonProperty(PropertyName = "ping_revoked_sris_endpoint")]
+        public string PingRevokedSrisEndpoint { get; set; }
+
         /// <summary>Gets or sets a value indicating whether request parameter supported.</summary>
         [JsonProperty(PropertyName = "request_parameter_supported")]
         public bool RequestParameterSupported { get; set; }
@@ -56,18 +61,26 @@ namespace Owin.Security.Providers.PingFederate.Messages
         [JsonProperty(PropertyName = "request_uri_parameter_supported")]
         public bool RequestUriParameterSupported { get; set; }
 
+        /// <summary>Gets or sets the response modes supported.</summary>
+        [JsonProperty(PropertyName = "response_modes_supported")]
+        public string[] ResponseModesSupported { get; set; }
+
         /// <summary>Gets or sets the response types supported.</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
         [JsonProperty(PropertyName = "response_types_supported")]
         public Collection<string> ResponseTypesSupported { get; set; }
 
+        /// <summary>Gets or sets the revocation endpoint.</summary>
+        [JsonProperty(PropertyName = "revocation_endpoint")]
+        public string RevocationEndpoint { get; set; }
+
         /// <summary>Gets or sets the scopes supported.</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
         [JsonProperty(PropertyName = "scopes_supported")]
         public Collection<string> ScopesSupported { get; set; }
 
         /// <summary>Gets or sets the subject types supported.</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
         [JsonProperty(PropertyName = "subject_types_supported")]
         public Collection<string> SubjectTypesSupported { get; set; }
 
@@ -76,7 +89,7 @@ namespace Owin.Security.Providers.PingFederate.Messages
         public string TokenEndpoint { get; set; }
 
         /// <summary>Gets or sets the token endpoint authentication methods supported.</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for deserialization")]
         [JsonProperty(PropertyName = "token_endpoint_auth_methods_supported")]
         public Collection<string> TokenEndpointAuthMethodsSupported { get; set; }
 

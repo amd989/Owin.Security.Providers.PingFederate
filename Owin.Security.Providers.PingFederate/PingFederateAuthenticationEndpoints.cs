@@ -5,12 +5,8 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //   GNU General Public License for more details.
 // </copyright>
-// <author>Alejandro Mora</author>
-// <summary>
-//   
-// </summary>
+// <author>alejandro.mora\Alejandro Mora</author>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace Owin.Security.Providers.PingFederate
 {
     /// <summary>The ping federate authentication endpoints.</summary>
@@ -22,7 +18,7 @@ namespace Owin.Security.Providers.PingFederate
         ///     Gets or sets Endpoint which is used to redirect users to request PingFederate access
         /// </summary>
         /// <remarks>
-        ///     Defaults to <see cref="PingFederateAuthenticationOptions.PingFederateUrl" />/as/authorization.oauth2
+        ///     Defaults to /as/authorization.oauth2
         /// </remarks>
         public string AuthorizationEndpoint { get; set; }
 
@@ -32,6 +28,40 @@ namespace Owin.Security.Providers.PingFederate
         ///     Connect protocol.
         /// </summary>
         public string MetadataEndpoint { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the session end endpoint.
+        ///     Asynchronous Front-Channel Logout provides OpenID Connect Clients the capability to initiate single logout requests
+        ///     to sign off associated SLO-enabled sessions;
+        ///     the logout request endpoint is /idp/startSLO.ping (see IdP Endpoints).
+        /// </summary>
+        /// <remarks>
+        ///     More information: https://documentation.pingidentity.com/display/PF73/Asynchronous+Front-Channel+Logout
+        /// </remarks>
+        public string PingEndSessionEndpoint { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the revoked SRIS endpoint.
+        ///     PingFederate includes a REST-based Web Service for Back-Channel Session Revocation.
+        ///     This service enables OAuth clients to add sessions to the revocation list or to query their revocation status.
+        /// </summary>
+        /// <remarks>
+        ///     The Grant Access to Session Revocation API option must be selected in its client configuration.
+        ///     More information: https://documentation.pingidentity.com/display/PF73/Back-Channel+Session+Revocation
+        /// </remarks>
+        public string PingRevokedSrisEndpoint { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the revocation endpoint.
+        ///     The token revocation endpoint is defined in the OAuth 2.0 Token Revocation (RFC 7009) specification.
+        ///     It allows clients to notify the authorization server that a previously obtained refresh or access token is no
+        ///     longer needed.
+        /// </summary>
+        /// <remarks>
+        ///     The revocation request invalidates the actual token and possibly other tokens based on the same authorization
+        ///     grant.
+        /// </remarks>
+        public string RevocationEndpoint { get; set; }
 
         /// <summary>
         ///     Gets or sets Endpoint which is used to exchange code for access token
