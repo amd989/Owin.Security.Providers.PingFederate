@@ -199,6 +199,11 @@ namespace Owin.Security.Providers.PingFederate
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
+        /// <summary>
+        ///     Gets or sets a value indicating whether to force the use of Uri.UriSchemeHttps for redirect Uri. Default is false
+        /// </summary>
+        public bool ForceRedirectUriSchemeHttps { get; set; }
+
         #endregion
     }
 }

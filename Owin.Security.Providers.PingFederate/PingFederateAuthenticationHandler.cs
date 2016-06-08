@@ -117,7 +117,7 @@ namespace Owin.Security.Providers.PingFederate
                 var context = new PingFederateAuthenticatingContext(this.Context, this.Options);
                 await this.Options.Provider.Authenticating(context);
 
-                var baseUri = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
+                var baseUri = Scheme() + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
                 var currentUri = baseUri + this.Request.Path + this.Request.QueryString; 
                 var redirectUri = baseUri + this.Options.CallbackPath;
 
@@ -215,7 +215,7 @@ namespace Owin.Security.Providers.PingFederate
                 var tokenRequestContext = new PingFederateTokenRequestContext(this.Context, this.Options, state, code, properties);
                 await this.Options.Provider.TokenRequest(tokenRequestContext);
 
-                var requestPrefix = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
+                var requestPrefix = Scheme() + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
                 var redirectUri = requestPrefix + Options.CallbackPath;
 
                 // Build up the body for the token request
@@ -524,7 +524,12 @@ namespace Owin.Security.Providers.PingFederate
             var baseUri = this.Request.Scheme + Uri.SchemeDelimiter + this.Request.Host + this.Request.PathBase;
             var redirectUri = baseUri + "/" + this.Options.ErrorPath;
             return redirectUri;
-        }     
+        }
+
+        private string Scheme()
+        {
+            return this.Options.ForceRedirectUriSchemeHttps ? Uri.UriSchemeHttps : this.Request.Scheme;
+        }
 
         #endregion
     }
