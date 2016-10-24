@@ -446,8 +446,10 @@ namespace Owin.Security.Providers.PingFederate
                     // add a redirect hint that sign-in failed because of ping errors
                     this.LogErrorResult(error, errorDescription);
                     var errorPath = this.ErrorPath();
-                    errorPath = WebUtilities.AddQueryString(errorPath, PingErrorCode, error);
-                    errorPath = WebUtilities.AddQueryString(errorPath, PingErrorDescriptionCode, errorDescription);
+                    if (!string.IsNullOrEmpty(error))
+                        errorPath = WebUtilities.AddQueryString(errorPath, PingErrorCode, error);
+                    if (!string.IsNullOrEmpty(errorDescription))
+                        errorPath = WebUtilities.AddQueryString(errorPath, PingErrorDescriptionCode, errorDescription);
                     this.Response.Redirect(errorPath);
                     return true;
                 }
