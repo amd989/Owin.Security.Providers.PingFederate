@@ -51,7 +51,7 @@ namespace Owin.Security.Providers.PingFederate.Provider
             this.Id = TryGetValue(user, "sub");
             this.Name = TryGetValue(user, "name");
             this.Link = TryGetValue(user, "website");
-            this.UserName = TryGetValue(user, "preferred_username");
+            this.UserName = TryGetValue(user, "preferred_username") ?? TryGetValue(user, "sub");
             this.Email = TryGetValue(user, "email");
         }
 

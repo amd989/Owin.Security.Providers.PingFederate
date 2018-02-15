@@ -32,9 +32,6 @@ namespace Owin.Security.Providers.PingFederate
     {
         #region Fields
 
-        /// <summary>The http client.</summary>
-        private readonly HttpClient httpClient;
-
         /// <summary>The logger.</summary>
         private readonly ILogger logger;
 
@@ -92,18 +89,10 @@ namespace Owin.Security.Providers.PingFederate
                 this.Options.SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType();
             }
 
-            this.httpClient = new HttpClient(ResolveHttpMessageHandler(this.Options))
-                                  {
-                                      Timeout = this.Options.BackchannelTimeout, MaxResponseContentBufferSize = 1024 * 1024 * 10, 
-                                  };
-
             if (this.Options.AuthenticationHandlerFactory == null)
             {
-                this.Options.AuthenticationHandlerFactory = new PingFederateAuthenticationHandlerFactory(this.httpClient, this.logger);
+                this.Options.AuthenticationHandlerFactory = new PingFederateAuthenticationHandlerFactory(this.logger);
             }
-
-            this.httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin PingFederate middleware");
-            this.httpClient.DefaultRequestHeaders.ExpectContinue = false;
         }
 
         #endregion
@@ -122,30 +111,6 @@ namespace Owin.Security.Providers.PingFederate
         protected override AuthenticationHandler<PingFederateAuthenticationOptions> CreateHandler()
         {
             return this.Options.AuthenticationHandlerFactory.CreateHandler();
-        }
-
-        /// <summary>The resolve http message handler.</summary>
-        /// <param name="options">The options.</param>
-        /// <returns>The <see cref="HttpMessageHandler"/>.</returns>
-        /// <exception cref="InvalidOperationException">If the web request handler is null</exception>
-        private static HttpMessageHandler ResolveHttpMessageHandler(PingFederateAuthenticationOptions options)
-        {
-            var handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
-
-            // If they provided a validator, apply it or fail.
-            if (options.BackchannelCertificateValidator != null)
-            {
-                // Set the cert validate callback
-                var webRequestHandler = handler as WebRequestHandler;
-                if (webRequestHandler == null)
-                {
-                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
-                }
-
-                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
-            }
-
-            return handler;
         }
 
         #endregion
