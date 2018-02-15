@@ -35,6 +35,7 @@ namespace Owin.Security.Providers.PingFederate
 
     using Owin.Security.Providers.PingFederate.Messages;
     using Owin.Security.Providers.PingFederate.Provider;
+    using Properties;
 
     /// <summary>The ping federate authentication handler.</summary>
     public class PingFederateAuthenticationHandler : AuthenticationHandler<PingFederateAuthenticationOptions>
@@ -54,9 +55,6 @@ namespace Owin.Security.Providers.PingFederate
 
         #region Fields
 
-        /// <summary>The http client.</summary>
-        private readonly HttpClient httpClient;
-
         /// <summary>The logger.</summary>
         private readonly ILogger logger;
 
@@ -65,11 +63,9 @@ namespace Owin.Security.Providers.PingFederate
         #region Constructors and Destructors
 
         /// <summary>Initializes a new instance of the <see cref="PingFederateAuthenticationHandler"/> class.</summary>
-        /// <param name="httpClient">The http client.</param>
         /// <param name="logger">The logger.</param>
-        public PingFederateAuthenticationHandler(HttpClient httpClient, ILogger logger)
+        public PingFederateAuthenticationHandler(ILogger logger)
         {
-            this.httpClient = httpClient;
             this.logger = logger;
         }
 
@@ -244,7 +240,7 @@ namespace Owin.Security.Providers.PingFederate
 
                 requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 requestMessage.Content = new FormUrlEncodedContent(body);
-                var tokenResponse = await this.httpClient.SendAsync(requestMessage);
+                var tokenResponse = await ClientSendAsync(requestMessage);
                 var text = await tokenResponse.Content.ReadAsStringAsync();
 
                 // Check if there was an error in the response
@@ -276,7 +272,7 @@ namespace Owin.Security.Providers.PingFederate
                     userRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     var formEncoded = new FormUrlEncodedContent(new Dictionary<string, string> { { Constants.OAuth2Constants.AccessToken, accessToken } });
                     userRequest.Content = formEncoded;
-                    var userResponse = await this.httpClient.SendAsync(userRequest, this.Request.CallCancelled);
+                    var userResponse = await ClientSendAsync(userRequest, this.Request.CallCancelled);
                     userResponse.EnsureSuccessStatusCode();
                     text = await userResponse.Content.ReadAsStringAsync();
                     user = JObject.Parse(text);
@@ -419,7 +415,7 @@ namespace Owin.Security.Providers.PingFederate
         {
             if (this.Options.DiscoverMetadata)
             {
-                var response = await this.httpClient.GetStringAsync(this.Options.PingFederateUrl + this.Options.Endpoints.MetadataEndpoint);
+                var response = await ClientGetStringAsync(this.Options.PingFederateUrl + this.Options.Endpoints.MetadataEndpoint);
                 var endpoints = JsonConvert.DeserializeObject<MetadataEndpoint>(response);
                 this.Options.Endpoints.AuthorizationEndpoint = endpoints.AuthorizationEndpoint;
                 this.Options.Endpoints.TokenEndpoint = endpoints.TokenEndpoint;
@@ -531,6 +527,95 @@ namespace Owin.Security.Providers.PingFederate
         private string Scheme()
         {
             return this.Options.ForceRedirectUriSchemeHttps ? Uri.UriSchemeHttps : this.Request.Scheme;
+        }
+
+        /// <summary>
+        /// Sends an http request
+        /// </summary>
+        /// <param name="requestMessage">http request message to be sent</param>
+        /// <returns>http response message corresponding to the call</returns>
+        private async Task<HttpResponseMessage> ClientSendAsync(HttpRequestMessage requestMessage)
+        {
+            using (WebRequestHandler handler = new WebRequestHandler())
+            {
+                using (HttpClient client = InitializeHttpClient(ResolveHttpMessageHandler(this.Options)))
+                {
+                    return await client.SendAsync(requestMessage);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends an http request
+        /// </summary>
+        /// <param name="requestMessage">http request message to be sent</param>
+        /// <param name="cancellationToken">Thread cancellation token</param>
+        /// <returns>http response message corresponding to the call</returns>
+        private async Task<HttpResponseMessage> ClientSendAsync(HttpRequestMessage requestMessage, System.Threading.CancellationToken cancellationToken)
+        {
+            using (WebRequestHandler handler = new WebRequestHandler())
+            {
+                using (HttpClient client = InitializeHttpClient(ResolveHttpMessageHandler(this.Options)))
+                {
+                    return await client.SendAsync(requestMessage, cancellationToken);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get a string from an http request
+        /// </summary>
+        /// <param name="requestUri">Uri to be used to perform web request</param>
+        /// <returns>string which corresponds to the response of web request performed</returns>
+        private async Task<String> ClientGetStringAsync(string requestUri)
+        {
+            using (WebRequestHandler handler = new WebRequestHandler())
+            {
+                using (HttpClient client = InitializeHttpClient(ResolveHttpMessageHandler(this.Options)))
+                {
+                    return await client.GetStringAsync(requestUri);
+                }
+            }
+        }
+
+        /// <summary>The resolve http message handler.</summary>
+        /// <param name="options">The options.</param>
+        /// <returns>The <see cref="HttpMessageHandler"/>.</returns>
+        /// <exception cref="InvalidOperationException">If the web request handler is null</exception>
+        private HttpMessageHandler ResolveHttpMessageHandler(PingFederateAuthenticationOptions options)
+        {
+            var handler = options.BackchannelHttpHandler ?? new WebRequestHandler();
+
+            // If they provided a validator, apply it or fail.
+            if (options.BackchannelCertificateValidator != null)
+            {
+                // Set the cert validate callback
+                var webRequestHandler = handler as WebRequestHandler;
+                if (webRequestHandler == null)
+                {
+                    throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
+                }
+                webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
+            }
+
+            return handler;
+        }
+
+        /// <summary>
+        /// Initiliaze http client with default parameters
+        /// </summary>
+        /// <param name="handler">Handler set to be used for http client</param>
+        /// <returns>An http client setup</returns>
+        private HttpClient InitializeHttpClient(HttpMessageHandler handler)
+        {
+            HttpClient client = new HttpClient(handler)
+            {
+                Timeout = this.Options.BackchannelTimeout,
+                MaxResponseContentBufferSize = 1024 * 1024 * 1,
+            };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft Owin PingFederate middleware");
+            client.DefaultRequestHeaders.ExpectContinue = false;
+            return client;
         }
 
         #endregion
