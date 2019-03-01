@@ -151,7 +151,7 @@ namespace Owin.Security.Providers.PingFederate
 
                 var explicitParameters = new Dictionary<string, string>
                                              {
-                                                 { Constants.OAuth2Constants.ResponseType, Constants.OAuth2Constants.ResponseTypes.Code }, 
+                                                 { Constants.OAuth2Constants.ResponseType, this.Options.ResponseType }, 
                                                  { Constants.OAuth2Constants.ClientId, Uri.EscapeDataString(this.Options.ClientId) }, 
                                                  { Constants.OAuth2Constants.RedirectUri, Uri.EscapeDataString(redirectUri) }, 
                                                  { Constants.OAuth2Constants.Scope, Uri.EscapeDataString(scope) }, 
