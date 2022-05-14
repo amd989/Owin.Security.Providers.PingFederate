@@ -1,5 +1,5 @@
 $root = $env:APPVEYOR_BUILD_FOLDER
-$version = [System.Reflection.Assembly]::LoadFile("$root\Owin.Security.Providers.PingFederate\bin\Release\Owin.Security.Providers.PingFederate.dll").GetName().Version
+$version = [System.Reflection.AssemblyName]::GetAssemblyName("$root\Owin.Security.Providers.PingFederate\bin\Release\Owin.Security.Providers.PingFederate.dll").Version
 $versionStr = "{0}.{1}.{2}" -f ($version.Major, $version.Minor, $version.Build)
 
 Write-Host "Setting .nuspec version tag to $versionStr"

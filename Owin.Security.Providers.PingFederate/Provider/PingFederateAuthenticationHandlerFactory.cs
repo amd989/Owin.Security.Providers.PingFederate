@@ -23,9 +23,6 @@ namespace Owin.Security.Providers.PingFederate.Provider
     {
         #region Fields
 
-        /// <summary>The http client.</summary>
-        private readonly HttpClient httpClient;
-
         /// <summary>The logger.</summary>
         private readonly ILogger logger;
 
@@ -34,11 +31,9 @@ namespace Owin.Security.Providers.PingFederate.Provider
         #region Constructors and Destructors
 
         /// <summary>Initializes a new instance of the <see cref="PingFederateAuthenticationHandlerFactory"/> class. Initializes a new instance of the <see cref="T:System.Object"/> class.</summary>
-        /// <param name="httpClient">The http Client.</param>
         /// <param name="logger">The logger.</param>
-        public PingFederateAuthenticationHandlerFactory(HttpClient httpClient, ILogger logger)
+        public PingFederateAuthenticationHandlerFactory(ILogger logger)
         {
-            this.httpClient = httpClient;
             this.logger = logger;
         }
 
@@ -50,7 +45,7 @@ namespace Owin.Security.Providers.PingFederate.Provider
         /// <returns>The <see cref="AuthenticationHandler" />.</returns>
         public AuthenticationHandler<PingFederateAuthenticationOptions> CreateHandler()
         {
-            return new PingFederateAuthenticationHandler(this.httpClient, this.logger);
+            return new PingFederateAuthenticationHandler(this.logger);
         }
 
         #endregion
